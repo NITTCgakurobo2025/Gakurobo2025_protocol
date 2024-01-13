@@ -20,7 +20,7 @@
 | 汎用GPIO用データ | 0x3 |
 
 Board IDはロータリーDIPなどで指定される値。  
-ID=0xFFの場合はboard_idの一致不一致関わらず受信し処理する。
+ID=0xFの場合はboard_idの一致不一致関わらず受信し処理する。
 
 ### マイコン-PC間のUSB通信
 
@@ -36,9 +36,9 @@ T1234567880011223344556677
 ```
 をシリアルで送ってあげればよい
 
-[python-can](https://python-can.readthedocs.io/en/stable/)を使えば割と簡単に利用できる
+[python-can](https://python-can.readthedocs.io/en/stable/)が使える  
 
-[slcan(python-can)の使い方](https://python-can.readthedocs.io/en/stable/interfaces/slcan.html)
+[python-canでのslcan](https://python-can.readthedocs.io/en/stable/interfaces/slcan.html)  
 
 ### ~~Serialの場合~~非推奨オレオレプロトコル  
 
@@ -107,13 +107,21 @@ nはモーターID（0~3）
 |0xnF4|MONITOR_REG2|uint64_t|r/w|モニターするレジスタを設定 reg ID 0xC0~0xE9|
 
 現在位置は上書き可能。  
+たとえばPOSに0を書きこめば現在位置が原点となる  
 
 ### MOTOR_TYPE
+
+PWM周りの設定が若干変わるだけなので現状ほとんど意味はない
 
 ||名称|備考|
 |:--:|:--:|:--:|
 |0x0|M2006||
 |0x1|M3508||
+
+### GEAR_RATIO
+
+初期値は36(M2006)となっている
+M3508を使いたいなら19にすると出力軸角度とPOSが一致する。
 
 ### CONTROL_MODE
 
@@ -124,8 +132,10 @@ nはモーターID（0~3）
 |0x2|POSITION_MODE|位置制御|
 |0x3|ABS_POSITION_MODE|絶対位置制御（AS5600利用）|
 
+なおABS_POSITION_MODEは未実装  
+
 ### MONITOR_REG
 
 MONITOR_PERIODで設定した周期でフィードバックするデータを選択する。  
 
-たとえば現在の速度を定期的に送ってほしければMONITOR_REGの0x20ビット目を1にして書きこむ。  
+たとえば現在の速度を定期的に送ってほしければMONITOR_REG1の0x20ビット目を1にして書きこむ。  
