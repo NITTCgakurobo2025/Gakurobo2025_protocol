@@ -103,8 +103,8 @@ nはモーターID（0~3）
 |0xnF0|MONITOR_PERIOD|uint16_t|r/w|データをフィードバックする周期(1ms単位) 0で停止|
 |0xnF1|MONITOR_REG1|uint64_t|r/w|モニターするレジスタを設定 reg ID 0~0x39|
 |0xnF2|MONITOR_REG2|uint64_t|r/w|モニターするレジスタを設定 reg ID 0x40~0x79|
-|0xnF3|MONITOR_REG2|uint64_t|r/w|モニターするレジスタを設定 reg ID 0x80~0xB9|
-|0xnF4|MONITOR_REG2|uint64_t|r/w|モニターするレジスタを設定 reg ID 0xC0~0xE9|
+|0xnF3|MONITOR_REG3|uint64_t|r/w|モニターするレジスタを設定 reg ID 0x80~0xB9|
+|0xnF4|MONITOR_REG4|uint64_t|r/w|モニターするレジスタを設定 reg ID 0xC0~0xE9|
 
 現在位置は上書き可能。  
 たとえばPOSに0を書きこめば現在位置が原点となる  
