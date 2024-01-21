@@ -75,7 +75,7 @@ REQEST_IDに対して返答する際は、Board IDに自身のID（ロータリ�
 | ロボマス制御基板 | 0x2 |
 | 汎用GPIO基板 | 0x3 |
 
-## ロボマス制御基板データ（Data type=0x1）  
+## ロボマス制御基板データ（Data type=0x2）  
 
 nはモーターID（0~3）  
 
@@ -94,7 +94,7 @@ nはモーターID（0~3）
 |0xn23|SPD_GAIN_P|float|r/w|速度Pゲイン|
 |0xn24|SPD_GAIN_I|float|r/w|速度Iゲイン|
 |0xn25|SPD_GAIN_D|float|r/w|速度Dゲイン|
-|0xn30|POS|flaot(rad/s)|r/w|現在の位置|
+|0xn30|POS|float(rad/s)|r/w|現在の位置|
 |0xn31|POS_TARGET|float(rad/s)|r/w|目標位置|
 |0xn32|SPD_LIM|float(rad/s)|r/w|速度制限|
 |0xn33|POS_GAIN_P|float|r/w|位置Pゲイン|
