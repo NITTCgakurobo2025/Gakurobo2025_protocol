@@ -85,7 +85,7 @@ nはモーターID（0~3）
 |0xn01|MOTOR_TYPE|uint8_t|r/w|enum MOTOR_TYPE|
 |0xn02|CONTROL_TYPE|uint8_t|r/w|enum CONTROL_TYPE|
 |0xn03|GEAR_RATIO|float|r/w|モーターのギア比|
-|0xn04|MOTOR_STATE|uint8_t|r/w|現在のモーターの状態表示|
+|0xn04|MOTOR_STATE|uint8_t|r|現在のモーターの状態表示|
 |0xn10|PWM|float(-1~1)|r|現在のPWM|
 |0xn11|PWM_TARGET|float(-1~1)|w/r|
 |0xn20|SPD|float(rad/s)|r|現在の速度|
