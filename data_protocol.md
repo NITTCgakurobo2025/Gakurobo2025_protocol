@@ -101,10 +101,7 @@ nはモーターID（0~3）
 |0xn34|POS_GAIN_I|float|r/w|位置Iゲイン|
 |0xn35|POS_GAIN_D|float|r/w|位置Dゲイン|
 |0xnF0|MONITOR_PERIOD|uint16_t|r/w|データをフィードバックする周期(1ms単位) 0で停止|
-|0xnF1|MONITOR_REG1|uint64_t|r/w|モニターするレジスタを設定 reg ID 0~0x3F|
-|0xnF2|MONITOR_REG2|uint64_t|r/w|モニターするレジスタを設定 reg ID 0x40~0x7F|
-|0xnF3|MONITOR_REG3|uint64_t|r/w|モニターするレジスタを設定 reg ID 0x80~0xBF|
-|0xnF4|MONITOR_REG4|uint64_t|r/w|モニターするレジスタを設定 reg ID 0xC0~0xFF|
+|0xnF1|MONITOR_REG|uint64_t|r/w|モニターするレジスタを設定 reg ID 0~0x3F|
 
 現在位置は上書き可能。  
 たとえばPOSに0を書きこめば現在位置が原点となる  
@@ -142,4 +139,4 @@ MONITOR_PERIODで設定した周期でフィードバックするデータを選
 0x1F0に書きこもうと0x2F0に書きこもうと動作は同じになる。  
 
 MONITOR_REGで設定したデータが定期的に送信される。  
-たとえば現在の速度を定期的に送ってほしければMONITOR_REG1の0x20ビット目を1にして書きこむ。  
+たとえば現在の速度を定期的に送ってほしければMONITOR_REGの0x20ビット目を1にして書きこむ。  
