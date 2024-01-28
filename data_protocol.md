@@ -75,6 +75,18 @@ REQEST_IDに対して返答する際は、Board IDに自身のID（ロータリ�
 | ロボマス制御基板 | 0x2 |
 | 汎用GPIO基板 | 0x3 |
 
+## 電源基板（Data type=0x1）
+
+|Register ID |name|data type|r/w?|概要|
+|:--:|:--:|:--:|:--:|:--:|
+|0x00|NOP|||
+|0x01|EMS_STATE|bool|r|非常停止スイッチONでtrue|
+|0x02|EMS_ENABLE|bool|r/w|遠隔非常停止リクエスト|
+|0x10|OUT_V|float|r|現在の電圧|
+|0x20|OUT_I|float|r|現在の電流|
+|0xF0|MONITOR_PERIOD|uint16_t|r/w|データをフィードバックする周期(1ms単位) 0で停止|
+|0xF1|MONITOR_REG|uint64_t|r/w|モニターするレジスタを設定 reg ID 0~0x3F|
+
 ## ロボマス制御基板データ（Data type=0x2）  
 
 nはモーターID（0~3）  
@@ -140,3 +152,18 @@ MONITOR_PERIODで設定した周期でフィードバックするデータを選
 
 MONITOR_REGで設定したデータが定期的に送信される。  
 たとえば現在の速度を定期的に送ってほしければMONITOR_REGの0x20ビット目を1にして書きこむ。  
+
+## GPIO基板（Data type = 0x3）
+
+|Register ID |name|data type|r/w?|概要|
+|:--:|:--:|:--:|:--:|:--:|
+|0x00|NOP|||
+|0x01|MODE|uint16_t|r/w|各PORTのモード|
+|0x02|PORT_STATE|uint16_t|r|各PORTの現在の状態|
+|0x03|PORT_OD|uint16_t|r/w|OUTPUTモードにしたPORTの出力|
+|0xF0|MONITOR_PERIOD|uint16_t|r/w|データをフィードバックする周期(1ms単位) 0で停止|
+|0xF1|MONITOR_REG|uint64_t|r/w|モニターするレジスタを設定 reg ID 0~0x3F|
+
+MODEは0で出力、1で入力モード
+
+GPIO基板でLEDテープを駆動する可能性があるのでその辺のモードを設定してもいいなおかなと思ったり思わなかったり。
