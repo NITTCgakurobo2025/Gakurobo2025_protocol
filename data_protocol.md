@@ -81,7 +81,7 @@ REQEST_IDに対して返答する際は、Board IDに自身のID（ロータリ�
 |:--:|:--:|:--:|:--:|:--:|
 |0x00|NOP|||
 |0x01|PCU_STATE|uint8_t|r|電源の状態|
-|0x02|CELL_N|uint8_t|r|リポのセル数|
+|0x02|CELL_N|uint8_t|r/w|リポのセル数|
 |0x03|EMS_RQ|bool|r/w|遠隔非常停止リクエスト|
 |0x10|OUT_V|float|r|現在の電圧|
 |0x11|V_EMS_EN|bool|r/w|過電圧・低電圧で非常停止を入れるか|
@@ -102,7 +102,7 @@ REQEST_IDに対して返答する際は、Board IDに自身のID（ロータリ�
 |0|EMS|非常停止スイッチON|
 |1|EX_EMS|基板内非常停止ON|
 |2|OVA|過電圧アラート|
-|3|UVA|低い電圧アラート|
+|3|UVA|低電圧アラート|
 |4|OIA|過電流アラート|
 
 なお基板内非常停止は遠隔非常停止や過電圧・過電流非常停止など、ソフトウェアによる非常停止全般を指す。  
@@ -119,8 +119,8 @@ nはモーターID（0~3）
 |0xn02|CONTROL_TYPE|uint8_t|r/w|enum CONTROL_TYPE|
 |0xn03|GEAR_RATIO|float|r/w|モーターのギア比|
 |0xn04|MOTOR_STATE|uint8_t|r|現在のモーターの状態表示|
-|0xn10|PWM|float(-1~1)|r|現在のPWM|
-|0xn11|PWM_TARGET|float(-1~1)|w/r|
+|0xn10|PWM|float|r|現在のPWM|
+|0xn11|PWM_TARGET|float|w/r|
 |0xn20|SPD|float(rad/s)|r|現在の速度|
 |0xn21|SPD_TARGET|float(rad/s)|r/w|目標速度|
 |0xn22|PWM_LIM|float(rad/s)|r/w|トルク制限|
