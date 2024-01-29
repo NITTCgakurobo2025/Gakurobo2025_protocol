@@ -80,12 +80,33 @@ REQEST_IDに対して返答する際は、Board IDに自身のID（ロータリ�
 |Register ID |name|data type|r/w?|概要|
 |:--:|:--:|:--:|:--:|:--:|
 |0x00|NOP|||
-|0x01|EMS_STATE|bool|r|非常停止スイッチONでtrue|
-|0x02|EMS_ENABLE|bool|r/w|遠隔非常停止リクエスト|
+|0x01|PCU_STATE|uint8_t|r|電源の状態|
+|0x02|CELL_N|uint8_t|r|リポのセル数|
+|0x03|EMS_RQ|bool|r/w|遠隔非常停止リクエスト|
 |0x10|OUT_V|float|r|現在の電圧|
+|0x11|V_EMS_EN|bool|r/w|過電圧・低電圧で非常停止を入れるか|
+|0x12|V_LIMIT_HIGH|float|r/w|セル当たりの電圧がこれを超えるとアラート|
+|0x13|V_LIMIT_LOW|float|r/w|セル当たりの電圧がこれを下回るととアラート|
 |0x20|OUT_I|float|r|現在の電流|
+|0x21|I_EMS_EN|bool|r/w|過電流で非常停止を入れるか|
+|0x22|I_LIMIT|float|r/w|この電流を超えるとアラート|
 |0xF0|MONITOR_PERIOD|uint16_t|r/w|データをフィードバックする周期(1ms単位) 0で停止|
 |0xF1|MONITOR_REG|uint64_t|r/w|モニターするレジスタを設定 reg ID 0~0x3F|
+
+### PCU_STATE  
+
+**PCU_STATE!=0ならなんかヤバいことが起きてるので非常停止シーケンス起動しろ**
+
+|bit|名称|概要|
+|:--:|:--:|:--:|
+|0|EMS|非常停止スイッチON|
+|1|EX_EMS|基板内非常停止ON|
+|2|OVA|過電圧アラート|
+|3|UVA|低い電圧アラート|
+|4|OIA|過電流アラート|
+
+なお基板内非常停止は遠隔非常停止や過電圧・過電流非常停止など、ソフトウェアによる非常停止全般を指す。  
+PCU_STATEはMONITORなどの設定が無い場合でも異常があった場合即座に発報する。  
 
 ## ロボマス制御基板データ（Data type=0x2）  
 
