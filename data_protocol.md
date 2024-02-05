@@ -111,6 +111,7 @@ PCU_STATEはMONITORなどの設定が無い場合でも異常があった場合�
 ## ロボマス制御基板データ（Data type=0x2）  
 
 nはモーターID（0~3）  
+cは全モーター共通（0x105も0x205も結果は同じ）
 
 |Register ID |name|data type|r/w?|概要|
 |:--:|:--:|:--:|:--:|:--:|
@@ -119,8 +120,9 @@ nはモーターID（0~3）
 |0xn02|CONTROL_TYPE|uint8_t|r/w|enum CONTROL_TYPE|
 |0xn03|GEAR_RATIO|float|r/w|モーターのギア比|
 |0xn04|MOTOR_STATE|uint8_t|r|現在のモーターの状態表示|
+|0xc05|CAN_TIMEOUT|uint16_t|r/w|この時間CAN信号が送られてこなければ停止 0で無効化|
 |0xn10|PWM|float|r|現在のPWM|
-|0xn11|PWM_TARGET|float|w/r|
+|0xn11|PWM_TARGET|float|r/w|PWM指令値|
 |0xn20|SPD|float(rad/s)|r|現在の速度|
 |0xn21|SPD_TARGET|float(rad/s)|r/w|目標速度|
 |0xn22|PWM_LIM|float(rad/s)|r/w|トルク制限|
@@ -133,8 +135,9 @@ nはモーターID（0~3）
 |0xn33|POS_GAIN_P|float|r/w|位置Pゲイン|
 |0xn34|POS_GAIN_I|float|r/w|位置Iゲイン|
 |0xn35|POS_GAIN_D|float|r/w|位置Dゲイン|
-|0xnF0|MONITOR_PERIOD|uint16_t|r/w|データをフィードバックする周期(1ms単位) 0で停止|
+|0xcF0|MONITOR_PERIOD|uint16_t|r/w|データをフィードバックする周期(1ms単位) 0で停止|
 |0xnF1|MONITOR_REG|uint64_t|r/w|モニターするレジスタを設定 reg ID 0~0x3F|
+|0xcFF
 
 現在位置は上書き可能。  
 たとえばPOSに0を書きこめば現在位置が原点となる  
@@ -164,6 +167,12 @@ M3508を使いたいなら19にすると出力軸角度とPOSが一致する。
 
 なおABS_POSITION_MODEは未実装  
 
+### CAN_TIMEOUT
+
+ここで設定した時間CANが受信できなければ自動的に全モータは動作を停止する（非常停止状態に移行）  
+0で無効化可能  
+初期値は0で無効化されている  
+
 ### MONITOR_PERIOD/REG
 
 MONITOR_PERIODで設定した周期でフィードバックするデータを選択する。  
@@ -173,6 +182,11 @@ MONITOR_PERIODで設定した周期でフィードバックするデータを選
 
 MONITOR_REGで設定したデータが定期的に送信される。  
 たとえば現在の速度を定期的に送ってほしければMONITOR_REGの0x20ビット目を1にして書きこむ。  
+
+### 非常停止時の動作
+
+ロボマス制御基板が非常停止信号を受け取ると即座にすべてのモーターの動作を即座に停止する。  
+具体的には全てのゲインを一次的に0とする感じで実装する予定。  
 
 ## GPIO基板（Data type = 0x3）
 
