@@ -13,8 +13,8 @@
 なお、Data typeは次の様
 | 名称 | ID |
 |:--:|:--:|
-| 共通データ形式（強制受信） | 0xF |
-| 共通データ形式 | 0x0 |
+| ~~共通データ形式（強制受信）~~ | 0xF |
+| ~~共通データ形式~~ | 0x0 |
 | 電源基板用データ | 0x1 |
 | ロボマス制御用データ | 0x2 |
 | 汎用GPIO用データ | 0x3 |
@@ -42,6 +42,10 @@ T1234567880011223344556677
 
 ### ~~Serialの場合~~非推奨オレオレプロトコル  
 
+どうしてもUSB側の帯域が足りなかった場合復活するかも  
+
+<details><summary>詳細</summary><div>
+
 |byte| bit | 名称 | 概要 |
 |:--:|:--:|:--:|:--:|
 |0|3|r/w|リモートフレーム枠|
@@ -51,14 +55,17 @@ T1234567880011223344556677
 |2|7:0|Register ID 15~8||
 |3|7:0|Register ID 7~0||
 
-~~0byte目はパケットの情報、1-3byte目はデータの情報的な~~
+0byte目はパケットの情報、1-3byte目はデータの情報的な
 
-~~実際にはCOBS形式にエンコードしてやり取りする~~
+実際にはCOBS形式にエンコードしてやり取りする
 
-どうしてもUSB側の帯域が足りなかった場合復活するかも
+</div></details>
 
-## 共通データ形式（Data type=0x0,0xF）  
+## ~~共通データ形式（Data type=0x0,0xF）~~ 一旦開発停止  
 
+めんどくさくなってきたので取敢えず凍結します
+
+<details><summary>概念</summary><div>
 |Register ID |name|data type|r/w?|概要|
 |:--:|:--:|:--:|:--:|:--:|
 |0x0|REQEST_ID|-|-|これを受信したデバイスは自身のIDを返せ|
@@ -75,20 +82,21 @@ REQEST_IDに対して返答する際は、Board IDに自身のID（ロータリ�
 | ロボマス制御基板 | 0x2 |
 | 汎用GPIO基板 | 0x3 |
 
+</div></details>
+
 ## 電源基板（Data type=0x1）
 
 |Register ID |name|data type|r/w?|概要|
 |:--:|:--:|:--:|:--:|:--:|
-|0x00|NOP|||
+|0x00|NOP||||
 |0x01|PCU_STATE|uint8_t|r|電源の状態|
 |0x02|CELL_N|uint8_t|r/w|リポのセル数|
-|0x03|EMS_RQ|bool|r/w|遠隔非常停止リクエスト|
+|0x03|EX_EMS_TRG|uint8_t|r/w|自動非常停止の条件設定|
+|0x04|EMS_RQ|bool|r/w|遠隔非常停止リクエスト|
 |0x10|OUT_V|float|r|現在の電圧|
-|0x11|V_EMS_EN|bool|r/w|過電圧・低電圧で非常停止を入れるか|
 |0x12|V_LIMIT_HIGH|float|r/w|セル当たりの電圧がこれを超えるとアラート|
 |0x13|V_LIMIT_LOW|float|r/w|セル当たりの電圧がこれを下回るととアラート|
 |0x20|OUT_I|float|r|現在の電流|
-|0x21|I_EMS_EN|bool|r/w|過電流で非常停止を入れるか|
 |0x22|I_LIMIT|float|r/w|この電流を超えるとアラート|
 |0xF0|MONITOR_PERIOD|uint16_t|r/w|データをフィードバックする周期(1ms単位) 0で停止|
 |0xF1|MONITOR_REG|uint64_t|r/w|モニターするレジスタを設定 reg ID 0~0x3F|
@@ -108,6 +116,17 @@ REQEST_IDに対して返答する際は、Board IDに自身のID（ロータリ�
 なお基板内非常停止は遠隔非常停止や過電圧・過電流非常停止など、ソフトウェアによる非常停止全般を指す。  
 PCU_STATEはMONITORなどの設定が無い場合でも異常があった場合即座に発報する。  
 
+### EX_EMS_TRG
+
+各異常が発生した際に基板内非常停止を入れるかの選択
+
+|bit|名称|概要|
+|:--:|:--:|:--:|
+|0:1|-|予約済み|
+|2|OVA_EMS_EN|過電圧アラート|
+|3|UVA_EMS_EN|低電圧アラート|
+|4|OIA_EMS_EN|過電流アラート|
+
 ## ロボマス制御基板データ（Data type=0x2）  
 
 nはモーターID（0~3）  
@@ -115,12 +134,12 @@ cは全モーター共通（0x105も0x205も結果は同じ）
 
 |Register ID |name|data type|r/w?|概要|
 |:--:|:--:|:--:|:--:|:--:|
-|0xn00|NOP|||
-|0xn01|MOTOR_TYPE|uint8_t|r/w|enum MOTOR_TYPE|
+|0xn00|NOP||||
+|0xn01|MOTOR_TYPE|uint8_t|r/w|**未実装**|
 |0xn02|CONTROL_TYPE|uint8_t|r/w|enum CONTROL_TYPE|
 |0xn03|GEAR_RATIO|float|r/w|モーターのギア比|
-|0xn04|MOTOR_STATE|uint8_t|r|現在のモーターの状態表示|
-|0xc05|CAN_TIMEOUT|uint16_t|r/w|この時間CAN信号が送られてこなければ停止 0で無効化|
+|0xn04|MOTOR_STATE|uint8_t|r|**未実装**|
+|0xc0F|CAN_TIMEOUT|uint16_t|r/w|この時間CAN信号が送られてこなければ停止 0で無効化|
 |0xn10|PWM|float|r|現在のPWM|
 |0xn11|PWM_TARGET|float|r/w|PWM指令値|
 |0xn20|SPD|float(rad/s)|r|現在の速度|
@@ -137,19 +156,9 @@ cは全モーター共通（0x105も0x205も結果は同じ）
 |0xn35|POS_GAIN_D|float|r/w|位置Dゲイン|
 |0xcF0|MONITOR_PERIOD|uint16_t|r/w|データをフィードバックする周期(1ms単位) 0で停止|
 |0xnF1|MONITOR_REG|uint64_t|r/w|モニターするレジスタを設定 reg ID 0~0x3F|
-|0xcFF
 
 現在位置は上書き可能。  
 たとえばPOSに0を書きこめば現在位置が原点となる  
-
-### MOTOR_TYPE
-
-PWM周りの設定が若干変わるだけなので現状ほとんど意味はない
-
-||名称|備考|
-|:--:|:--:|:--:|
-|0x0|M2006||
-|0x1|M3508||
 
 ### GEAR_RATIO
 
@@ -165,37 +174,29 @@ M3508を使いたいなら19にすると出力軸角度とPOSが一致する。
 |0x2|POSITION_MODE|位置制御|
 |0x3|ABS_POSITION_MODE|絶対位置制御（AS5600利用）|
 
-なおABS_POSITION_MODEは未実装  
-
 ### CAN_TIMEOUT
 
-ここで設定した時間CANが受信できなければ自動的に全モータは動作を停止する（非常停止状態に移行）  
-0で無効化可能  
-初期値は0で無効化されている  
+ここで設定した時間CANが受信できなければ自動的に全モータはPWMモードに移行し停止する  
+CAN復活時の自動再設定などは要望があれば実装するかも
 
 ### MONITOR_PERIOD/REG
 
 MONITOR_PERIODで設定した周期でフィードバックするデータを選択する。  
 
-なお周期は全モーター共通なので個別に設定することはできない。  
+なお周期は全モーター共通なので**個別に設定することはできない。**  
 0x1F0に書きこもうと0x2F0に書きこもうと動作は同じになる。  
 
 MONITOR_REGで設定したデータが定期的に送信される。  
 たとえば現在の速度を定期的に送ってほしければMONITOR_REGの0x20ビット目を1にして書きこむ。  
 
-### 非常停止時の動作
-
-ロボマス制御基板が非常停止信号を受け取ると即座にすべてのモーターの動作を即座に停止する。  
-具体的には全てのゲインを一次的に0とする感じで実装する予定。  
-
 ## GPIO基板（Data type = 0x3）
 
 |Register ID |name|data type|r/w?|概要|
 |:--:|:--:|:--:|:--:|:--:|
-|0x00|NOP|||
+|0x00|NOP||||
 |0x01|MODE|uint16_t|r/w|各PORTのモード|
-|0x02|PORT_STATE|uint16_t|r|各PORTの現在の状態|
-|0x03|PORT_OD|uint16_t|r/w|OUTPUTモードにしたPORTの出力|
+|0x02|PORT_READ|uint16_t|r|各PORTの現在の状態|
+|0x03|PORT_WRITE|uint16_t|w|OUTPUTモードにしたPORTの出力 PICのLAT|
 |0xF0|MONITOR_PERIOD|uint16_t|r/w|データをフィードバックする周期(1ms単位) 0で停止|
 |0xF1|MONITOR_REG|uint64_t|r/w|モニターするレジスタを設定 reg ID 0~0x3F|
 
