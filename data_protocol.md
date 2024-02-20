@@ -66,6 +66,7 @@ T1234567880011223344556677
 めんどくさくなってきたので取敢えず凍結します
 
 <details><summary>概念</summary><div>
+
 |Register ID |name|data type|r/w?|概要|
 |:--:|:--:|:--:|:--:|:--:|
 |0x0|REQEST_ID|-|-|これを受信したデバイスは自身のIDを返せ|
