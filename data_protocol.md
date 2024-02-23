@@ -192,15 +192,35 @@ MONITOR_REGで設定したデータが定期的に送信される。
 
 ## GPIO基板（Data type = 0x3）
 
+nは操作したいピン番号
+
 |Register ID |name|data type|r/w?|概要|
 |:--:|:--:|:--:|:--:|:--:|
 |0x00|NOP||||
-|0x01|MODE|uint16_t|r/w|各PORTのモード|
-|0x02|PORT_READ|uint16_t|r|各PORTの現在の状態|
+|0x01|PORT_READ|uint16_t|r|各PORTの現在の状態|
 |0x03|PORT_WRITE|uint16_t|w|OUTPUTモードにしたPORTの出力 PICのLAT|
+|0x1n|PWM_PERIOD|uint16_t|w|ソフトウェアPWMの周期|
+|0x2n|PWM_DUTY|uint16_t|w|ソフトウェアPWMのduty|
 |0xF0|MONITOR_PERIOD|uint16_t|r/w|データをフィードバックする周期(1ms単位) 0で停止|
 |0xF1|MONITOR_REG|uint64_t|r/w|モニターするレジスタを設定 reg ID 0~0x3F|
 
-MODEは0で出力、1で入力モード
+MODEは0で出力(PWM)、1で入力モード
 
-GPIO基板でLEDテープを駆動する可能性があるのでその辺のモードを設定してもいいなおかなと思ったり思わなかったり。
+各ピンは出力モードにした時、ソフトウェアPWMとして駆動することができる。  
+
+### ソフトウェアPWMの動作
+
+PWM出力に用いるカウンタは50kHzでカウントアップしている。  
+たとえば50Hz、duty比30%（サーボ用PWM）を出力する場合、  
+
+$$
+\text{PWM\_PERIOD}=\frac{1}{50[Hz]}/\frac{1}{50000[Hz]}=1000
+$$
+
+$$
+\text{PWM\_DUTY}=\text{PWM\_PERIOD}*0.3=300
+$$
+
+と設定すればよい。  
+ピンに対応するPORT_WRITEレジスタのビットが1の時PWM出力され、0の時は出力されず、LOWとなる。  
+PWMを出力せず単にGPIOとして動作させたい場合はDuty比100%となるようPWM_DUTYを設定（0xFFFFなど）すれば良い。  
