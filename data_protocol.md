@@ -197,8 +197,9 @@ nは操作したいピン番号
 |Register ID |name|data type|r/w?|概要|
 |:--:|:--:|:--:|:--:|:--:|
 |0x00|NOP||||
-|0x01|PORT_READ|uint16_t|r|各PORTの現在の状態|
-|0x03|PORT_WRITE|uint16_t|w|OUTPUTモードにしたPORTの出力 PICのLAT|
+|0x01|PORT_MODE|uint16_t|r|各PINのモード一括設定|
+|0x02|PORT_READ|uint16_t|r|各PINの現在の状態を一括で読む|
+|0x03|PORT_WRITE|uint16_t|w|OUTPUTモードにしたPINの出力 PICのLAT|
 |0x1n|PWM_PERIOD|uint16_t|w|ソフトウェアPWMの周期|
 |0x2n|PWM_DUTY|uint16_t|w|ソフトウェアPWMのduty|
 |0xF0|MONITOR_PERIOD|uint16_t|r/w|データをフィードバックする周期(1ms単位) 0で停止|
