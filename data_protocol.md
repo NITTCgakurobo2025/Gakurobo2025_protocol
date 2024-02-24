@@ -214,13 +214,13 @@ MODEは0で出力(PWM)、1で入力モード
 PWM出力に用いるカウンタは50kHzでカウントアップしている。  
 たとえば50Hz、duty比30%（サーボ用PWM）を出力する場合、  
 
-$$
+```math
 \text{PWM\_PERIOD}=\frac{1}{50[Hz]}/\frac{1}{50000[Hz]}=1000
-$$
+```
 
-$$
+```math
 \text{PWM\_DUTY}=\text{PWM\_PERIOD}*0.3=300
-$$
+```
 
 と設定すればよい。  
 ピンに対応するPORT_WRITEレジスタのビットが1の時PWM出力され、0の時は出力されず、LOWとなる。  
