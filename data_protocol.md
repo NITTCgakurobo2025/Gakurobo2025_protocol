@@ -69,8 +69,8 @@ T1234567880011223344556677
 
 |Register ID |name|data type|r/w?|概要|
 |:--:|:--:|:--:|:--:|:--:|
-|0x0|REQEST_ID|-|-|これを受信したデバイスは自身のIDを返せ|
-|0x1|RESPONSE_ID|uint8_t|-|データ部分は基板形式 下参照|
+|0x0|ID_REQEST|-|-|これを受信したデバイスは自身のIDを返せ|
+|0x1|ID_RESPONSE|uint8_t|-|データ部分は基板形式 下参照|
 |0x2|SAVE_PARAM|-|-|ゲイン等現在のパラメータを保存|
 |0xE|EMERGENCY_STOP|-|-|非常停止|
 |0xF|RESET_EMERGENCY_STOP|-|-|非常停止解除|
@@ -93,7 +93,7 @@ REQEST_IDに対して返答する際は、Board IDに自身のID（ロータリ�
 |0x01|PCU_STATE|uint8_t|r|電源の状態|
 |0x02|CELL_N|uint8_t|r/w|リポのセル数|
 |0x03|EX_EMS_TRG|uint8_t|r/w|自動非常停止の条件設定|
-|0x04|EMS_RQ|bool|r/w|遠隔非常停止リクエスト|
+|0x04|EMS_RQ|bool|w|遠隔非常停止リクエスト|
 |0x10|OUT_V|float|r|現在の電圧|
 |0x12|V_LIMIT_HIGH|float|r/w|セル当たりの電圧がこれを超えるとアラート|
 |0x13|V_LIMIT_LOW|float|r/w|セル当たりの電圧がこれを下回るととアラート|
@@ -108,14 +108,16 @@ REQEST_IDに対して返答する際は、Board IDに自身のID（ロータリ�
 
 |bit|名称|概要|
 |:--:|:--:|:--:|
-|0|EMS|非常停止スイッチON|
-|1|EX_EMS|基板内非常停止ON|
+|0|EMS|非常停止が入っているか|
+|1|SOFT_EMS|ソフトウェア非常停止|
 |2|OVA|過電圧アラート|
 |3|UVA|低電圧アラート|
 |4|OIA|過電流アラート|
 
-なお基板内非常停止は遠隔非常停止や過電圧・過電流非常停止など、ソフトウェアによる非常停止全般を指す。  
-PCU_STATEはMONITORなどの設定が無い場合でも異常があった場合即座に発報する。  
+なおソフトウェア非常停止は遠隔非常停止や過電圧・過電流非常停止など、ソフトウェアによる非常停止全般を指す。  
+ソフトウェア非常停止が入っている場合、非常停止スイッチが押されているか否かにかかわらずEMSは1となるので注意。  
+
+PCU_STATEはMONITORなどの設定が無い場合でも変化があった場合即座に発報する。  
 
 ### EX_EMS_TRG
 
@@ -140,7 +142,7 @@ cは全モーター共通（0x105も0x205も結果は同じ）
 |0xn02|CONTROL_TYPE|uint8_t|r/w|enum CONTROL_TYPE|
 |0xn03|GEAR_RATIO|float|r/w|モーターのギア比|
 |0xn04|MOTOR_STATE|uint8_t|r|**未実装**|
-|0xc0F|CAN_TIMEOUT|uint16_t|r/w|この時間CAN信号が送られてこなければ停止 0で無効化|
+|0xc05|CAN_TIMEOUT|uint16_t|r/w|この時間CAN信号が送られてこなければ停止 0で無効化|
 |0xn10|PWM|float|r|現在のPWM|
 |0xn11|PWM_TARGET|float|r/w|PWM指令値|
 |0xn20|SPD|float(rad/s)|r|現在の速度|
