@@ -61,29 +61,25 @@ T1234567880011223344556677
 
 </div></details>
 
-## ~~共通データ形式（Data type=0x0,0xF）~~ 一旦開発停止  
-
-めんどくさくなってきたので取敢えず凍結します
-
-<details><summary>概念</summary><div>
+## 共通データ形式（Data type=0x0,0xF）  
 
 |Register ID |name|data type|r/w?|概要|
 |:--:|:--:|:--:|:--:|:--:|
-|0x0|ID_REQEST|-|-|これを受信したデバイスは自身のIDを返せ|
-|0x1|ID_RESPONSE|uint8_t|-|データ部分は基板形式 下参照|
-|0x2|SAVE_PARAM|-|-|ゲイン等現在のパラメータを保存|
+|0x0|NOP||||
+|0x1|ID_REQEST|uint8_t|-|これを受信したデバイスは自身のIDを返せ|
+|0x2|~~SAVE_PARAM~~|-|-|いつかやる|
 |0xE|EMERGENCY_STOP|-|-|非常停止|
 |0xF|RESET_EMERGENCY_STOP|-|-|非常停止解除|
 
-REQEST_IDに対して返答する際は、Board IDに自身のID（ロータリーDIPの値）、data[0]に基板の形式を入れてData type 0x0で返す。
+リモートフレームでID_REQUESTを送信することでバス上のデバイスを調べることができる。  
+リクエストを受け取ったデバイスは、Board IDに自身のID（ロータリーDIPの値）、data[0]に基板の形式を入れてData type 0x0で返す。  
+
 基板形式は以下の通り。  
 | 名称 | ID |
 |:--:|:--:|
 | 電源基板 | 0x1 |
 | ロボマス制御基板 | 0x2 |
 | 汎用GPIO基板 | 0x3 |
-
-</div></details>
 
 ## 電源基板（Data type=0x1）
 
@@ -141,7 +137,7 @@ cは全モーター共通（0x105も0x205も結果は同じ）
 |0xn01|MOTOR_TYPE|uint8_t|r/w|**未実装**|
 |0xn02|CONTROL_TYPE|uint8_t|r/w|enum CONTROL_TYPE|
 |0xn03|GEAR_RATIO|float|r/w|モーターのギア比|
-|0xn04|MOTOR_STATE|uint8_t|r|**未実装**|
+|0xn04|MOTOR_STATE|bool|r|ドライバがつながっていたらtrue|
 |0xc05|CAN_TIMEOUT|uint16_t|r/w|この時間CAN信号が送られてこなければ停止 0で無効化|
 |0xn10|PWM|float|r|現在のPWM|
 |0xn11|PWM_TARGET|float|r/w|PWM指令値|
