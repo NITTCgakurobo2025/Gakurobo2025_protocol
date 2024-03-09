@@ -134,7 +134,7 @@ cは全モーター共通（0x105も0x205も結果は同じ）
 |Register ID |name|data type|r/w?|概要|
 |:--:|:--:|:--:|:--:|:--:|
 |0xn00|NOP||||
-|0xn01|MOTOR_TYPE|uint8_t|r/w|**未実装**|
+|0xn01|MOTOR_TYPE|uint8_t|r/w|接続するドライバの種類|
 |0xn02|CONTROL_TYPE|uint8_t|r/w|enum CONTROL_TYPE|
 |0xn03|GEAR_RATIO|float|r/w|モーターのギア比|
 |0xn04|MOTOR_STATE|bool|r|ドライバがつながっていたらtrue|
@@ -161,6 +161,16 @@ cは全モーター共通（0x105も0x205も結果は同じ）
 
 現在位置は上書き可能。  
 たとえばPOSに0を書きこめば現在位置が原点となる  
+
+### MOTOR_TYPE
+
+||名称|
+|:--:|:--:|
+|0x0|C610/C620|
+|0x1|VESC|
+
+VESCにしたときは必ずCONTROL_TYPEをPWM_MODEにすること。  
+ABS_POSITION_MODEはワンチャン動作するかもしれないが非推奨  
 
 ### GEAR_RATIO
 
