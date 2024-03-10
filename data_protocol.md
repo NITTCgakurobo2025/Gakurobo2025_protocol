@@ -90,6 +90,7 @@ T1234567880011223344556677
 |0x02|CELL_N|uint8_t|r/w|リポのセル数|
 |0x03|EX_EMS_TRG|uint8_t|r/w|自動非常停止の条件設定|
 |0x04|EMS_RQ|bool|w|遠隔非常停止リクエスト|
+|0x05|COMMON_EMS_EN|bool|r/w|非常停止スイッチが押されたときにCommonReg::EMERGENCY_STOPを発報するか 初期値true|
 |0x10|OUT_V|float|r|現在の電圧|
 |0x12|V_LIMIT_HIGH|float|r/w|セル当たりの電圧がこれを超えるとアラート|
 |0x13|V_LIMIT_LOW|float|r/w|セル当たりの電圧がこれを下回るととアラート|
