@@ -157,6 +157,7 @@ cは全モーター共通（0x105も0x205も結果は同じ）
 |0xn36|ABS_POS|float|r|アブソリュートエンコーダによる絶対位置|
 |0xn37|ABS_SPD|float|r|アブソリュートエンコーダによる絶対速度|
 |0xn38|ENC_INV|bool|r/w|エンコーダの回転方向反転|
+|0xn39|ABS_TURN_CNT|int32_t|r/w|エンコーダの回転回数|
 |0xcF0|MONITOR_PERIOD|uint16_t|r/w|データをフィードバックする周期(1ms単位) 0で停止|
 |0xnF1|MONITOR_REG|uint64_t|r/w|モニターするレジスタを設定 reg ID 0~0x3F|
 
