@@ -1,16 +1,18 @@
 # 学ロボ2024 CAN/Serialプロトコル  
 
-### CANの場合  
+基本的にIDとデータの意味は一対一対応する構成となっている。  
 
-| bit | 名称 | 概要 |
-|:--:|:--:|:--:|
-|28|予約済み|ただしCANの物理プロトコルの特性上本質的に優先度　0推奨|
-|27:24|Priority level|優先度（0~Fで0が最高）|
-|23:20|Data type|データの種類|
-|19:16|Board ID|基板の固有ID(0~F)|
-|15:0|Register ID||
+## IDの構成について
 
-なお、Data typeは次の様
+IDはPriority level,Data type,Board ID,Register IDの4つの情報を組み合わせで表現される。  
+
+#### Priority level
+
+優先度。  
+ただし優先的に送信されるようなコードが構築されることを保証するものではなく、0が優先されるというCANバスの特性を利用する簡易的な優先度である。  
+
+#### Data type
+
 | 名称 | ID |
 |:--:|:--:|
 | 共通データ形式（強制受信） | 0xF |
@@ -19,8 +21,29 @@
 | ロボマス制御用データ | 0x2 |
 | 汎用GPIO用データ | 0x3 |
 
-Board IDはロータリーDIPなどで指定される値。  
-ID=0xFの場合はboard_idの一致不一致関わらず受信し処理する。
+ID=0xFの場合はboard_idの一致不一致関わらず受信し処理する。  
+非常停止コマンドなど、バス上の全デバイスが受信すべきものに使用する。  
+
+#### Board ID
+
+ロータリーDIPなどで指定される基板固有の値。  
+
+#### Register ID
+
+データの具体的な内容を意味する。  
+詳細は下参照
+
+### CANの場合  
+
+拡張IDを用いる。  
+
+| bit | 名称 |
+|:--:|:--:|
+|28|予約済み 0推奨|
+|27:24|Priority level|
+|23:20|Data type|
+|19:16|Board ID|
+|15:0|Register ID|
 
 ### マイコン-PC間のUSB通信
 
@@ -31,9 +54,11 @@ https://www.canusb.com/docs/can232_v3.pdf
 ↑プロトコルはこの辺参照
 
 たとえば拡張ID=0x12345678,DLC=8,Data={0x00,0x11,0x22,0x33,x044,0x55,0x66,0x77}を送りたいなら  
+
 ```
-T1234567880011223344556677
+T1234567880011223344556677[CR]
 ```
+
 をシリアルで送ってあげればよい
 
 [python-can](https://python-can.readthedocs.io/en/stable/)が使える  
@@ -61,15 +86,17 @@ T1234567880011223344556677
 
 </div></details>
 
-## 共通データ形式（Data type=0x0,0xF）  
+## register IDの詳細
+
+### 共通データ形式（Data type=0x0,0xF）  
 
 |Register ID |name|data type|r/w?|概要|
 |:--:|:--:|:--:|:--:|:--:|
-|0x0|NOP||||
-|0x1|ID_REQEST|uint8_t|-|これを受信したデバイスは自身のIDを返せ|
-|0x2|~~SAVE_PARAM~~|-|-|いつかやる|
-|0xE|EMERGENCY_STOP|-|-|非常停止|
-|0xF|RESET_EMERGENCY_STOP|-|-|非常停止解除|
+|0x0000|NOP||||
+|0x0001|ID_REQEST|uint8_t|-|これを受信したデバイスは自身のIDを返せ|
+|0x0002|~~SAVE_PARAM~~|-|-|いつかやる|
+|0x000E|EMERGENCY_STOP|-|-|非常停止|
+|0x000F|RESET_EMERGENCY_STOP|-|-|非常停止解除|
 
 リモートフレームでID_REQUESTを送信することでバス上のデバイスを調べることができる。  
 リクエストを受け取ったデバイスは、Board IDに自身のID（ロータリーDIPの値）、data[0]に基板の形式を入れてData type 0x0で返す。  
@@ -81,44 +108,45 @@ T1234567880011223344556677
 | ロボマス制御基板 | 0x2 |
 | 汎用GPIO基板 | 0x3 |
 
-## 電源基板（Data type=0x1）
+### 電源基板（Data type=0x1）
 
 |Register ID |name|data type|r/w?|概要|
 |:--:|:--:|:--:|:--:|:--:|
-|0x00|NOP||||
-|0x01|PCU_STATE|uint8_t|r|電源の状態|
-|0x02|CELL_N|uint8_t|r/w|リポのセル数|
-|0x03|EX_EMS_TRG|uint8_t|r/w|自動非常停止の条件設定|
-|0x04|EMS_RQ|bool|w|遠隔非常停止リクエスト|
-|0x05|COMMON_EMS_EN|bool|r/w|非常停止スイッチが押されたときにCommonReg::EMERGENCY_STOPを発報するか 初期値true|
-|0x10|OUT_V|float|r|現在の電圧|
-|0x12|V_LIMIT_HIGH|float|r/w|セル当たりの電圧がこれを超えるとアラート|
-|0x13|V_LIMIT_LOW|float|r/w|セル当たりの電圧がこれを下回るととアラート|
-|0x20|OUT_I|float|r|現在の電流|
-|0x22|I_LIMIT|float|r/w|この電流を超えるとアラート|
-|0xF0|MONITOR_PERIOD|uint16_t|r/w|データをフィードバックする周期(1ms単位) 0で停止|
-|0xF1|MONITOR_REG|uint64_t|r/w|モニターするレジスタを設定 reg ID 0~0x3F|
+|0x0000|NOP||||
+|0x0001|PCU_STATE|uint8_t|r|電源の状態|
+|0x0002|CELL_N|uint8_t|r/w|リポのセル数|
+|0x0003|EX_EMS_TRG|uint8_t|r/w|自動非常停止の条件設定|
+|0x0004|EMS_RQ|bool|w|遠隔非常停止リクエスト|
+|0x0005|COMMON_EMS_EN|bool|r/w|非常停止スイッチが押されたときにCommonReg::EMERGENCY_STOPを発報するか 初期値true|
+|0x0010|OUT_V|float|r|現在の電圧|
+|0x0012|V_LIMIT_HIGH|float|r/w|セル当たりの電圧がこれを超えるとアラート|
+|0x0013|V_LIMIT_LOW|float|r/w|セル当たりの電圧がこれを下回るととアラート|
+|0x0020|OUT_I|float|r|現在の電流|
+|0x0022|I_LIMIT|float|r/w|この電流を超えるとアラート|
+|0x00F0|MONITOR_PERIOD|uint16_t|r/w|データをフィードバックする周期(1ms単位) 0で停止|
+|0x00F1|MONITOR_REG|uint64_t|r/w|モニターするレジスタを設定 reg ID 0~0x3F|
 
-### PCU_STATE  
+#### PCU_STATE  
 
 **PCU_STATE!=0ならなんかヤバいことが起きてるので非常停止シーケンス起動しろ**
 
 |bit|名称|概要|
 |:--:|:--:|:--:|
 |0|EMS|非常停止が入っているか|
-|1|SOFT_EMS|ソフトウェア非常停止|
+|1|SOFT_EMS|ソフトウェア非常停止がかかっているか|
 |2|OVA|過電圧アラート|
 |3|UVA|低電圧アラート|
 |4|OIA|過電流アラート|
 
 なおソフトウェア非常停止は遠隔非常停止や過電圧・過電流非常停止など、ソフトウェアによる非常停止全般を指す。  
-ソフトウェア非常停止が入っている場合、非常停止スイッチが押されているか否かにかかわらずEMSは1となるので注意。  
+EMS bitは電源基板のリレーのON/OFFを示す。  
+よって非常停止スイッチによる非常停止・ソフトウェア非常停止のどちらの場合にも1となる。  
 
-PCU_STATEはMONITORなどの設定が無い場合でも変化があった場合即座に発報する。  
+PCU_STATEは変化があった場合即座に発報される。  
 
-### EX_EMS_TRG
+#### EX_EMS_TRG
 
-各異常が発生した際に基板内非常停止を入れるかの選択
+各異常が発生した際にソフトウェア非常停止を入れるかの選択
 
 |bit|名称|概要|
 |:--:|:--:|:--:|
@@ -127,44 +155,44 @@ PCU_STATEはMONITORなどの設定が無い場合でも変化があった場合�
 |3|UVA_EMS_EN|低電圧アラート|
 |4|OIA_EMS_EN|過電流アラート|
 
-## ロボマス制御基板データ（Data type=0x2）  
+### ロボマス制御基板データ（Data type=0x2）  
 
 nはモーターID（0~3）  
-cは全モーター共通（0x105も0x205も結果は同じ）
+cは全モーター共通（例えば0x105も0x205も結果的に同じものが書き換わるのでどちらでも良い）
 
 |Register ID |name|data type|r/w?|概要|
 |:--:|:--:|:--:|:--:|:--:|
-|0xn00|NOP||||
-|0xn01|MOTOR_TYPE|uint8_t|r/w|接続するドライバの種類|
-|0xn02|CONTROL_TYPE|uint8_t|r/w|enum CONTROL_TYPE|
-|0xn03|GEAR_RATIO|float|r/w|モーターのギア比|
-|0xn04|MOTOR_STATE|bool|r|ドライバがつながっていたらtrue|
-|0xc05|CAN_TIMEOUT|uint16_t|r/w|この時間CAN信号が送られてこなければ停止 0で無効化|
-|0xn10|PWM|float|r|現在のPWM|
-|0xn11|PWM_TARGET|float|r/w|PWM指令値|
-|0xn20|SPD|float(rad/s)|r|現在の速度|
-|0xn21|SPD_TARGET|float(rad/s)|r/w|目標速度|
-|0xn22|PWM_LIM|float(rad/s)|r/w|トルク制限|
-|0xn23|SPD_GAIN_P|float|r/w|速度Pゲイン|
-|0xn24|SPD_GAIN_I|float|r/w|速度Iゲイン|
-|0xn25|SPD_GAIN_D|float|r/w|速度Dゲイン|
-|0xn30|POS|float(rad/s)|r/w|現在の位置|
-|0xn31|POS_TARGET|float(rad/s)|r/w|目標位置|
-|0xn32|SPD_LIM|float(rad/s)|r/w|速度制限|
-|0xn33|POS_GAIN_P|float|r/w|位置Pゲイン|
-|0xn34|POS_GAIN_I|float|r/w|位置Iゲイン|
-|0xn35|POS_GAIN_D|float|r/w|位置Dゲイン|
-|0xn36|ABS_POS|float|r|アブソリュートエンコーダによる絶対位置|
-|0xn37|ABS_SPD|float|r|アブソリュートエンコーダによる絶対速度|
-|0xn38|ENC_INV|bool|r/w|エンコーダの回転方向反転|
-|0xn39|ABS_TURN_CNT|int32_t|r/w|エンコーダの回転回数|
-|0xcF0|MONITOR_PERIOD|uint16_t|r/w|データをフィードバックする周期(1ms単位) 0で停止|
-|0xnF1|MONITOR_REG|uint64_t|r/w|モニターするレジスタを設定 reg ID 0~0x3F|
+|0x0n00|NOP||||
+|0x0n01|MOTOR_TYPE|uint8_t|r/w|接続するドライバの種類|
+|0x0n02|CONTROL_TYPE|uint8_t|r/w|enum CONTROL_TYPE|
+|0x0n03|GEAR_RATIO|float|r/w|モーターのギア比|
+|0x0n04|MOTOR_STATE|bool|r|ドライバがつながっていたらtrue|
+|0x0c05|CAN_TIMEOUT|uint16_t|r/w|この時間CAN信号が送られてこなければ停止 0で無効化|
+|0x0n10|PWM|float|r|現在のPWM|
+|0x0n11|PWM_TARGET|float|r/w|PWM指令値|
+|0x0n20|SPD|float(rad/s)|r|現在の速度|
+|0x0n21|SPD_TARGET|float(rad/s)|r/w|目標速度|
+|0x0n22|PWM_LIM|float(rad/s)|r/w|トルク制限|
+|0x0n23|SPD_GAIN_P|float|r/w|速度Pゲイン|
+|0x0n24|SPD_GAIN_I|float|r/w|速度Iゲイン|
+|0x0n25|SPD_GAIN_D|float|r/w|速度Dゲイン|
+|0x0n30|POS|float(rad/s)|r/w|現在の位置|
+|0x0n31|POS_TARGET|float(rad/s)|r/w|目標位置|
+|0x0n32|SPD_LIM|float(rad/s)|r/w|速度制限|
+|0x0n33|POS_GAIN_P|float|r/w|位置Pゲイン|
+|0x0n34|POS_GAIN_I|float|r/w|位置Iゲイン|
+|0x0n35|POS_GAIN_D|float|r/w|位置Dゲイン|
+|0x0n36|ABS_POS|float|r|アブソリュートエンコーダによる絶対位置|
+|0x0n37|ABS_SPD|float|r|アブソリュートエンコーダによる絶対速度|
+|0x0n38|ENC_INV|bool|r/w|エンコーダの回転方向反転|
+|0x0n39|ABS_TURN_CNT|int32_t|r/w|エンコーダの回転回数|
+|0x0cF0|MONITOR_PERIOD|uint16_t|r/w|データをフィードバックする周期(1ms単位) 0で停止|
+|0x0nF1|MONITOR_REG|uint64_t|r/w|モニターするレジスタを設定 reg ID 0~0x3F|
 
 現在位置は上書き可能。  
 たとえばPOSに0を書きこめば現在位置が原点となる  
 
-### MOTOR_TYPE
+#### MOTOR_TYPE
 
 ||名称|
 |:--:|:--:|
@@ -174,12 +202,12 @@ cは全モーター共通（0x105も0x205も結果は同じ）
 VESCにしたときは必ずCONTROL_TYPEをPWM_MODEにすること。  
 ABS_POSITION_MODEはワンチャン動作するかもしれないが非推奨  
 
-### GEAR_RATIO
+#### GEAR_RATIO
 
 初期値は36(M2006)となっている
 M3508を使いたいなら19にすると出力軸角度とPOSが一致する。
 
-### CONTROL_MODE
+#### CONTROL_MODE
 
 ||名称|備考|
 |:--:|:--:|:--:|
@@ -188,49 +216,49 @@ M3508を使いたいなら19にすると出力軸角度とPOSが一致する。
 |0x2|POSITION_MODE|位置制御|
 |0x3|ABS_POSITION_MODE|絶対位置制御（AS5600利用）|
 
-### CAN_TIMEOUT
+#### CAN_TIMEOUT
 
 ここで設定した時間CANが受信できなければ自動的に非常停止状態に移行する
 
-### ABS_POS/ABS_SPD
+#### ABS_POS/ABS_SPD
 
 アブソリュートエンコーダエンコーダによる位置・速度情報  
 回転速度が速すぎると回転数カウントがバグって誤差が出る可能性があるので注意（よっぽど大丈夫だけど）
 POSのようには上書きできない  
 
-### 非常停止
+#### 非常停止
 
 共通コマンドのEMERGENCY_STOPが来るとすべてのモータはPWMモードに移行して停止する。  
 RESET_EMERGENCY_STOPでモード設定などは復活するが、電源が落ちた状態でモーターを回すと、回転数情報などがバグるためPOSがずれる可能性が高いため注意。  
 非常停止解除時に原点出しシーケンスを起動するのが望ましい。  
 
-## GPIO基板（Data type = 0x3）
+### GPIO基板（Data type = 0x3）
 
 nは操作したいピン番号（銀将の場合0~8）
 
 |Register ID |name|data type|r/w?|概要|
 |:--:|:--:|:--:|:--:|:--:|
-|0x00|NOP||||
-|0x01|PORT_MODE|uint16_t|w|各PINのモード一括設定|
-|0x02|PORT_READ|uint16_t|r|各PINの現在の状態を一括で読む|
-|0x03|PORT_WRITE|uint16_t|w|OUTPUTモードにしたPINの出力 PICのLAT|
-|0x04|PORT_INT_EN|uint16_t|w|ピン変化割り込みの有効化|
-|0x05|ESC_MODE_EN|uint16_t|w|サーボモードで駆動するピンの選択|
-|0x1n|PWM_PERIOD|uint16_t|r/w|ソフトウェアPWMの周期|
-|0x2n|PWM_DUTY|uint16_t|r/w|ソフトウェアPWMのduty|
-|0xF0|MONITOR_PERIOD|uint16_t|r/w|データをフィードバックする周期(1ms単位) 0で停止|
-|0xF1|MONITOR_REG|uint64_t|r/w|モニターするレジスタを設定 reg ID 0~0x3F|
+|0x0000|NOP||||
+|0x0001|PORT_MODE|uint16_t|w|各PINのモード一括設定|
+|0x0002|PORT_READ|uint16_t|r|各PINの現在の状態を一括で読む|
+|0x0003|PORT_WRITE|uint16_t|w|OUTPUTモードにしたPINの出力 PICのLAT|
+|0x0004|PORT_INT_EN|uint16_t|w|ピン変化割り込みの有効化|
+|0x0005|ESC_MODE_EN|uint16_t|w|サーボモードで駆動するピンの選択|
+|0x001n|PWM_PERIOD|uint16_t|r/w|ソフトウェアPWMの周期|
+|0x002n|PWM_DUTY|uint16_t|r/w|ソフトウェアPWMのduty|
+|0x00F0|MONITOR_PERIOD|uint16_t|r/w|データをフィードバックする周期(1ms単位) 0で停止|
+|0x00F1|MONITOR_REG|uint64_t|r/w|モニターするレジスタを設定 reg ID 0~0x3F|
 
 MODEは0で出力(PWM)、1で入力モード
 
 各ピンは出力モードにした時、ソフトウェアPWMとして駆動することができる。  
 
-### 入力モードの際の動作
+#### 入力モードの際の動作
 
 基本的に各ポートは入力モードでマイコン内蔵抵抗によりプルアップされている。そのため何もセンサー等を接続しない場合、PORT_READを読み取ると0x1FFといった値が帰ってくる。  
 なお、PORT_READレジスタはHIGHで1、LOWで0となる。
 
-### ソフトウェアPWMの動作
+#### ソフトウェアPWMの動作
 
 PWM出力に用いるカウンタは50kHzでカウントアップしている。  
 たとえば50Hz、duty比30%（サーボ用PWM）を出力する場合、  
@@ -247,13 +275,13 @@ PWM出力に用いるカウンタは50kHzでカウントアップしている。
 ピンに対応するPORT_WRITEレジスタのビットが1の時PWM出力され、0の時は出力されず、LOWとなる。  
 PWMを出力せず単にGPIOとして動作させたい場合はDuty比100%となるようPWM_DUTYを設定（0xFFFFなど）すれば良い。  
 
-### ピン変化割り込み動作
+#### ピン変化割り込み動作
 
 ピンの状態に変化があった際に即座に信号を発報して欲しい場合、PORT_INT_ENを用いることができる。  
 変化を通知して欲しいポート番号に対応するビットを1とすることで有効化、0で無効化となる。  
 なおチャタリング除去処理により0.5ms程度の遅れが生じる可能性はあるため注意。  
 
-### ESC_MODE_EN
+#### ESC_MODE_EN
 
 ラジコン用ESCを駆動するためのPWMを生成するやつ。  
 1で有効になり、設定されたportは自動的に50HzのPWM出力モードに切り替わる。  
@@ -265,7 +293,7 @@ ESCモードを有効にした際と非常停止解除信号(0x0pF0000F)を受�
 すでにESC_MODEとなっている状態でESC_MODE_ENに有効化指令を送っても起動シーケンスは始動しない。  
 始動したい場合は非常停止解除信号を送信すること。  
 
-### MONITOR_PERIOD/REGについて（全データ形式共通）
+## MONITOR_PERIOD/REGについて（全データ形式共通）  
 
 MONITOR_PERIODで設定した周期でフィードバックするデータを選択する。  
 
