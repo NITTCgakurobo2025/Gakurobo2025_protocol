@@ -120,12 +120,12 @@ T1234567880011223344556677[CR]
 |0x0003|EX_EMS_TRG|uint8_t|r/w|自動非常停止の条件設定|
 |0x0004|EMS_RQ|bool|w|遠隔非常停止リクエスト|
 |0x0005|COMMON_EMS_EN|bool|r/w|非常停止がかかった時にCommonReg::EMERGENCY_STOPを発報するか 初期値true|
-|0x0010|OUT_V|float|r|現在の電圧|
-|0x0012|V_LIMIT_HIGH|float|r/w|セル当たりの電圧がこれを超えるとアラート|
-|0x0013|V_LIMIT_LOW|float|r/w|セル当たりの電圧がこれを下回るととアラート|
-|0x0020|OUT_I|float|r|現在の電流|
-|0x0022|I_LIMIT|float|r/w|この電流を超えるとアラート|
-|0x00F0|MONITOR_PERIOD|uint16_t|r/w|データをフィードバックする周期(1ms単位) 0で停止|
+|0x0010|OUT_V|float(V)|r|現在の電圧|
+|0x0012|V_LIMIT_HIGH|float(V)|r/w|セル当たりの電圧がこれを超えるとアラート|
+|0x0013|V_LIMIT_LOW|float(V)|r/w|セル当たりの電圧がこれを下回るととアラート|
+|0x0020|OUT_I|float(A)|r|現在の電流|
+|0x0022|I_LIMIT|float(A)|r/w|この電流を超えるとアラート|
+|0x00F0|MONITOR_PERIOD|uint16_t(ms)|r/w|データをフィードバックする周期(1ms単位) 0で停止|
 |0x00F1|MONITOR_REG|uint64_t|r/w|モニターするレジスタを設定|
 
 #### PCU_STATE  
@@ -171,26 +171,26 @@ cは全モーターに共通する設定項目（例えば0x105も0x205も結果
 |0x0n02|CONTROL_TYPE|uint8_t|r/w|enum CONTROL_TYPE|
 |0x0n03|GEAR_RATIO|float|r/w|モーターのギア比|
 |0x0n04|MOTOR_STATE|bool|r|ドライバがつながっていたらtrue|
-|0x0c05|CAN_TIMEOUT|uint16_t|r/w|この時間CAN信号が送られてこなければ停止 0で無効化|
+|0x0c05|CAN_TIMEOUT|uint16_t(ms)|r/w|この時間CAN信号が送られてこなければ停止 0で無効化|
 |0x0n10|PWM|float|r|現在のPWM|
 |0x0n11|PWM_TARGET|float|r/w|PWM指令値|
 |0x0n20|SPD|float(rad/s)|r|現在の速度|
 |0x0n21|SPD_TARGET|float(rad/s)|r/w|目標速度|
-|0x0n22|PWM_LIM|float(rad/s)|r/w|トルク制限|
+|0x0n22|PWM_LIM|float|r/w|トルク制限|
 |0x0n23|SPD_GAIN_P|float|r/w|速度Pゲイン|
 |0x0n24|SPD_GAIN_I|float|r/w|速度Iゲイン|
 |0x0n25|SPD_GAIN_D|float|r/w|速度Dゲイン|
-|0x0n30|POS|float(rad/s)|r/w|現在の位置|
-|0x0n31|POS_TARGET|float(rad/s)|r/w|目標位置|
+|0x0n30|POS|float(rad)|r/w|現在の位置|
+|0x0n31|POS_TARGET|float(rad)|r/w|目標位置|
 |0x0n32|SPD_LIM|float(rad/s)|r/w|速度制限|
 |0x0n33|POS_GAIN_P|float|r/w|位置Pゲイン|
 |0x0n34|POS_GAIN_I|float|r/w|位置Iゲイン|
 |0x0n35|POS_GAIN_D|float|r/w|位置Dゲイン|
-|0x0n36|ABS_POS|float|r|アブソリュートエンコーダによる絶対位置|
-|0x0n37|ABS_SPD|float|r|アブソリュートエンコーダによる絶対速度|
+|0x0n36|ABS_POS|float(rad)|r|アブソリュートエンコーダによる絶対位置|
+|0x0n37|ABS_SPD|float(rad/s)|r|アブソリュートエンコーダによる絶対速度|
 |0x0n38|ABS_ENC_INV|bool|r/w|アブソエンコーダの回転方向反転|
 |0x0n39|ABS_TURN_CNT|int32_t|r/w|アブソエンコーダの回転回数|
-|0x0cF0|MONITOR_PERIOD|uint16_t|r/w|データをフィードバックする周期(1ms単位) 0で停止|
+|0x0cF0|MONITOR_PERIOD|uint16_t(ms)|r/w|データをフィードバックする周期(1ms単位) 0で停止|
 |0x0nF1|MONITOR_REG|uint64_t|r/w|モニターするレジスタを設定|
 
 #### POS
@@ -249,7 +249,7 @@ nは操作したいピン番号（銀将の場合0~8）
 |0x0000|NOP||||
 |0x0001|PORT_MODE|uint16_t|w|各ピンのモード一括設定|
 |0x0002|PORT_READ|uint16_t|r|各ピンの現在の状態を一括で読む|
-|0x0003|PORT_WRITE|uint16_t|w|OUTPUTモードにしたPINの出力 PICのLAT|
+|0x0003|PORT_WRITE|uint16_t|w|OUTPUTモードにしたPINの出力 PICで言うLAT|
 |0x0004|PORT_INT_EN|uint16_t|w|ピン変化割り込みの有効化|
 |0x0005|ESC_MODE_EN|uint16_t|w|サーボモードで駆動するピンの選択|
 |0x001n|PWM_PERIOD|uint16_t|r/w|ソフトウェアPWMの周期|
