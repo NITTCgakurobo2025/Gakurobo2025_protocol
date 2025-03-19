@@ -1,4 +1,4 @@
-# 学ロボ2024 CAN/Serialプロトコル  
+# 学ロボ2025 CAN/Serialプロトコル
 
 基本的にIDとデータの意味は一対一対応する構成となっている。  
 
@@ -204,6 +204,8 @@ cは全モーターに共通する設定項目（例えば0x105も0x205も結果
 |:--:|:--:|
 |0x0|C610/C620|
 |0x1|VESC|
+|0x2|ROB3|
+|0x3|ROB4|
 
 VESCにしたときは必ずCONTROL_TYPEをPWM_MODEにすること。  
 ABS_POSITION_MODEはワンチャン動作するかもしれないが非推奨  
@@ -257,8 +259,14 @@ nは操作したいピン番号（銀将の場合0~8）
 |0x0005|ESC_MODE_EN|uint16_t|w|サーボモードで駆動するピンの選択|
 |0x001n|PWM_PERIOD|uint16_t|r/w|ソフトウェアPWMの周期|
 |0x002n|PWM_DUTY|uint16_t|r/w|ソフトウェアPWMのduty|
-|0x00F0|MONITOR_PERIOD|uint16_t|r/w|データをフィードバックする周期(1ms単位) 0で停止|
-|0x00F1|MONITOR_REG|uint64_t|r/w|モニターするレジスタを設定 reg ID 0~0x3F|
+|0x0n30|SPD|float|r/w|現在の速度|
+|0x0n31|SPD_TARGET|float|r/w|目標速度|
+|0x0n32|PWM_LIM|float|r/w|トルク制限|
+|0x0n33|SPD_GAIN_P|float|r/w|速度Pゲイン|
+|0x0n34|SPD_GAIN_I|float|r/w|速度Iゲイン|
+|0x0n35|SPD_GAIN_D|float|r/w|速度Dゲイン|
+|0x0cF0|MONITOR_PERIOD|uint16_t|r/w|データをフィードバックする周期(1ms単位) 0で停止|
+|0x0nF1|MONITOR_REG|uint64_t|r/w|モニターするレジスタを設定 reg ID 0~0x3F|
 
 PORT_MODEは0で出力、1で入力モード。
 
@@ -317,3 +325,7 @@ MONITOR_REGで設定したデータが定期的に送信される。
 
 bool型は1byte。0でfalseでそれ以外はtrue。  
 データはすべてリトルエディアン。  
+
+## リスペクト元
+
+[学ロボ2024プロトコル](https://github.com/gakurobo-taro/Gakurobo2024_protocol/tree/main)
