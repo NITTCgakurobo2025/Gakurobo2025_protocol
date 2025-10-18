@@ -191,7 +191,7 @@ cは全モーターに共通する設定項目（例えば0x105も0x205も結果
 |0x0n38|ABS_ENC_INV|bool|r/w|アブソエンコーダの回転方向反転|
 |0x0n39|ABS_TURN_CNT|int32_t|r/w|アブソエンコーダの回転回数|
 |0x0n3A|POS_TARGET_F|float(rad)|w|目標位置(Robstrideのアブソリュートエンコーダ基準の位置)|
-|0x0n3B|POS_SET_F|float(rad)|w|マイコン上の0点上書き(Robstrideのアブソリュートエンコーダでの位置を入力すること)|
+|0x0n3B|POS_SET_F|float(rad)|w|位置制御オフセット設定(入力値はRobstrideのエンコーダの値で)|
 |0x0cF0|MONITOR_PERIOD|uint16_t(ms)|r/w|データをフィードバックする周期(1ms単位) 0で停止|
 |0x0nF1|MONITOR_REG|uint64_t|r/w|モニターするレジスタを設定|
 
